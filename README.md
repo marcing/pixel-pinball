@@ -1,5 +1,7 @@
 # Pixel Pinball
 
+**[Play now](https://marcing.github.io/pixel-pinball/)**
+
 A retro pixel-art pinball game built with vanilla JavaScript and [Matter.js](https://brm.io/matter-js/) physics.
 
 ## Features
