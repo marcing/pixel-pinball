@@ -32,7 +32,7 @@ export function renderTableWalls(ctx) {
   ctx.shadowColor = c.s;
   ctx.shadowBlur = 12;
   ctx.beginPath();
-  ctx.moveTo(98 * S, 757 * S);
+  ctx.moveTo(98 * S + 5, 757 * S);
   ctx.lineTo(16 * S, 757 * S);
   ctx.lineTo(16 * S, 16 * S);
   ctx.lineTo(aP2x, 16 * S);
@@ -100,10 +100,10 @@ export function renderTableWalls(ctx) {
   ctx.beginPath();
   ctx.moveTo(383 * S, 100 * S);
   ctx.lineTo(383 * S, 757 * S);
-  ctx.lineTo(301 * S, 757 * S);
+  ctx.lineTo(301 * S - 5, 757 * S);
   ctx.stroke();
 
-  // Outer right wall
+  // Outer right wall (starts where arc curve ends)
   ctx.lineWidth = 5;
   ctx.beginPath();
   ctx.moveTo(TW - 16, aP0y);
@@ -119,7 +119,7 @@ export function renderTableWalls(ctx) {
 
   // Left slingshot
   const lsX1 = 16 * S, lsY1 = 560 * S;
-  const lsX2 = 98 * S, lsY2 = 700 * S;
+  const lsX2 = 98 * S + 5, lsY2 = 700 * S - 10;
   const lsGrad = ctx.createLinearGradient(lsX1, lsY1, lsX2, lsY2);
   lsGrad.addColorStop(0, c.a + '08');
   lsGrad.addColorStop(1, c.a + '18');
@@ -131,7 +131,7 @@ export function renderTableWalls(ctx) {
 
   // Right slingshot
   const rsX1 = 383 * S, rsY1 = 560 * S;
-  const rsX2 = 301 * S, rsY2 = 700 * S;
+  const rsX2 = 301 * S - 5, rsY2 = 700 * S - 10;
   const rsGrad = ctx.createLinearGradient(rsX1, rsY1, rsX2, rsY2);
   rsGrad.addColorStop(0, c.a + '08');
   rsGrad.addColorStop(1, c.a + '18');
@@ -171,8 +171,8 @@ export function renderTableWalls(ctx) {
   ctx.fillStyle = dzGrad;
   ctx.beginPath();
   ctx.moveTo(16 * S, 560 * S);
-  ctx.lineTo(98 * S, 700 * S);
-  ctx.lineTo(98 * S, 755 * S);
+  ctx.lineTo(98 * S + 5, 700 * S - 10);
+  ctx.lineTo(98 * S + 5, 755 * S);
   ctx.lineTo(16 * S, 755 * S);
   ctx.closePath();
   ctx.fill();
@@ -193,8 +193,8 @@ export function renderTableWalls(ctx) {
   ctx.globalAlpha = 0.5;
   ctx.beginPath();
   ctx.moveTo(16 * S, 560 * S);
-  ctx.lineTo(98 * S, 700 * S);
-  ctx.lineTo(98 * S, 755 * S);
+  ctx.lineTo(98 * S + 5, 700 * S - 10);
+  ctx.lineTo(98 * S + 5, 755 * S);
   ctx.stroke();
   ctx.globalAlpha = 1;
 
@@ -206,8 +206,8 @@ export function renderTableWalls(ctx) {
   ctx.fillStyle = rdzGrad;
   ctx.beginPath();
   ctx.moveTo(383 * S, 560 * S);
-  ctx.lineTo(301 * S, 700 * S);
-  ctx.lineTo(301 * S, 755 * S);
+  ctx.lineTo(301 * S - 5, 700 * S - 10);
+  ctx.lineTo(301 * S - 5, 755 * S);
   ctx.lineTo(383 * S, 755 * S);
   ctx.closePath();
   ctx.fill();
@@ -226,8 +226,8 @@ export function renderTableWalls(ctx) {
   ctx.globalAlpha = 0.5;
   ctx.beginPath();
   ctx.moveTo(383 * S, 560 * S);
-  ctx.lineTo(301 * S, 700 * S);
-  ctx.lineTo(301 * S, 755 * S);
+  ctx.lineTo(301 * S - 5, 700 * S - 10);
+  ctx.lineTo(301 * S - 5, 755 * S);
   ctx.stroke();
   ctx.globalAlpha = 1;
 
@@ -236,16 +236,16 @@ export function renderTableWalls(ctx) {
   ctx.shadowColor = c.s;
   ctx.shadowBlur = 8;
   ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.moveTo(98 * S, 695 * S); ctx.lineTo(98 * S, 755 * S); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(301 * S, 695 * S); ctx.lineTo(301 * S, 755 * S); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(98 * S + 5, 695 * S); ctx.lineTo(98 * S + 5, 755 * S); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(301 * S - 5, 695 * S); ctx.lineTo(301 * S - 5, 755 * S); ctx.stroke();
 
   // Bottom floor
   ctx.lineWidth = 5;
   ctx.beginPath();
-  ctx.moveTo(16 * S, 757 * S); ctx.lineTo(98 * S, 757 * S);
+  ctx.moveTo(16 * S, 757 * S); ctx.lineTo(98 * S + 5, 757 * S);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(301 * S, 757 * S); ctx.lineTo(383 * S, 757 * S);
+  ctx.moveTo(301 * S - 5, 757 * S); ctx.lineTo(383 * S, 757 * S);
   ctx.stroke();
 
   ctx.shadowBlur = 0;

@@ -189,10 +189,14 @@ export class PinballGame {
 
     // Top wall (bottom edge aligned with visual at 16*S)
     w.push(Bodies.rectangle(170 * S, 16 * S - 15, 320 * S, 30, o));
-    // Left wall (right edge aligned with visual at 16*S)
-    w.push(Bodies.rectangle(16 * S - 15, TH / 2, 30, TH, o));
-    // Right wall (starts below arc's lowest point at y=95*S)
-    const rwTop = 95 * S;
+    // Left wall — split into top (bouncier) and bottom sections
+    const lwSplit = 200 * S;
+    const lwTopH = lwSplit;
+    w.push(Bodies.rectangle(16 * S - 15, lwTopH / 2, 30, lwTopH, { ...o, restitution: 1.0 }));
+    const lwBotH = TH - lwSplit;
+    w.push(Bodies.rectangle(16 * S - 15, lwSplit + lwBotH / 2, 30, lwBotH, o));
+    // Right wall (starts where the arc curve ends)
+    const rwTop = 78 * S;
     const rwH = TH - rwTop;
     w.push(Bodies.rectangle(TW - 2, rwTop + rwH / 2, 30, rwH, o));
 
@@ -203,9 +207,9 @@ export class PinballGame {
 
     // Right upper corner arc boundary — chain of rotated rectangles along bezier curve
     // Skip first 2 segments to avoid overlap with right wall (prevents ball pinch)
-    const arcP0x = TW - 16, arcP0y = 100 * S;
-    const arcP1x = TW - 16, arcP1y = 16 * S;
-    const arcP2x = 258 * S, arcP2y = 16 * S;
+    const arcP0x = TW - 6, arcP0y = 100 * S + 5;
+    const arcP1x = TW - 6, arcP1y = 16 * S - 7;
+    const arcP2x = 258 * S + 6, arcP2y = 16 * S - 5;
     const arcThick = 8 * S;
     const arcSegs = 12;
     const arcPts = [];
@@ -233,8 +237,8 @@ export class PinballGame {
     // Use _polyCentroid to ensure body placement matches vertex coordinates exactly.
     const leftSlingVerts = [
       { x: 16 * S, y: 560 * S },   // slope top (wall junction)
-      { x: 98 * S, y: 700 * S },   // slope bottom end
-      { x: 98 * S, y: 757 * S },   // bottom-right (floor)
+      { x: 98 * S + 5, y: 700 * S - 10 },   // slope bottom end
+      { x: 98 * S + 5, y: 757 * S },   // bottom-right (floor)
       { x: 16 * S, y: 757 * S }    // bottom-left (wall/floor)
     ];
     const lc = this._polyCentroid(leftSlingVerts);
@@ -243,8 +247,8 @@ export class PinballGame {
     const rightSlingVerts = [
       { x: 383 * S, y: 560 * S },  // slope top (wall junction)
       { x: 383 * S, y: 757 * S },  // bottom-right (wall/floor)
-      { x: 301 * S, y: 757 * S },  // bottom-left (floor)
-      { x: 301 * S, y: 700 * S }   // slope bottom end
+      { x: 301 * S - 5, y: 757 * S },  // bottom-left (floor)
+      { x: 301 * S - 5, y: 700 * S - 10 }   // slope bottom end
     ];
     const rc = this._polyCentroid(rightSlingVerts);
     w.push(Bodies.fromVertices(rc.x, rc.y, rightSlingVerts, { ...o, label: 'slingshot' }));
@@ -607,7 +611,7 @@ export class PinballGame {
             const v = ball.velocity;
             const spd = Math.sqrt(v.x * v.x + v.y * v.y);
             if (spd > 1.5) {
-              const drag = 0.93;
+              const drag = 0.96;
               Body.setVelocity(ball, { x: v.x * drag, y: v.y * drag });
               // Friction sparks
               this.wallFrictionContacts.push({
@@ -623,9 +627,9 @@ export class PinballGame {
             });
             // Small outward push on left/right outer walls
             if (ball.position.x < 50 * S) {
-              Body.applyForce(ball, ball.position, { x: 0.004, y: 0 });
+              Body.applyForce(ball, ball.position, { x: 0.008, y: 0 });
             } else if (ball.position.x > 360 * S && ball.position.x < 383 * S) {
-              Body.applyForce(ball, ball.position, { x: -0.004, y: 0 });
+              Body.applyForce(ball, ball.position, { x: -0.008, y: 0 });
             }
           }
           this.sound.wall();
@@ -1065,7 +1069,7 @@ export class PinballGame {
     if (power < 0.1) return;
 
     const speed = 5 + power * 25;
-    Body.setVelocity(this.ball, { x: 0, y: -speed });
+    Body.setVelocity(this.ball, { x: -2 - power * 2, y: -speed });
 
     this.ballLaunched = true;
     this.launchPower = 0;
