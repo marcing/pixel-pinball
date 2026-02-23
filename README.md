@@ -60,7 +60,3 @@ Then visit [http://localhost:3000](http://localhost:3000).
 │   └── events.js     # Visual event feedback
 └── server.js         # Minimal Node.js dev server
 ```
-
-## License
-
-MIT
