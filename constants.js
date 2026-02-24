@@ -6,7 +6,9 @@ export const TOTAL_LEVELS = 20;
 // Scale factor — fixed at 1.5 (original 400x760 design)
 export const S = 1.5;
 
-// Progressive scoring: 150 (L1) → 1100 (L20), uniform 50-point increments
+// Progressive scoring: 150 (L1) → 1000 (L20)
+// L1-L5: +25 increments, L6-L20: +50 increments
 export function scoreForLevel(level) {
-  return 150 + (level - 1) * 50;   // 150, 200, 250, ..., 1100
+  if (level <= 5) return 150 + (level - 1) * 25;   // 150, 175, 200, 225, 250
+  return 250 + (level - 5) * 50;                    // 300, 350, ..., 1000
 }

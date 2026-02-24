@@ -414,7 +414,7 @@ export function renderTunnels(ctx) {
     ctx.stroke();
 
     ctx.fillStyle = col;
-    ctx.globalAlpha = 0.3;
+    ctx.globalAlpha = 0.33;
     ctx.font = 'bold ' + Math.floor(10 * S) + 'px monospace';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(isEntry ? 'IN' : 'OUT', x, y);

@@ -184,17 +184,15 @@ export class PinballGame {
   }
 
   createTableWalls() {
-    const o = { isStatic: true, restitution: 0.8, friction: 0.02, label: 'wall' };
+    const o = { isStatic: true, restitution: 0.8, friction: 0.005, label: 'wall' };
     const w = [];
 
-    // Top wall (bottom edge aligned with visual at 16*S)
-    w.push(Bodies.rectangle(170 * S, 16 * S - 15, 320 * S, 30, o));
-    // Left wall — split into top (bouncier) and bottom sections
-    const lwSplit = 200 * S;
-    const lwTopH = lwSplit;
-    w.push(Bodies.rectangle(16 * S - 15, lwTopH / 2, 30, lwTopH, { ...o, restitution: 1.0 }));
-    const lwBotH = TH - lwSplit;
-    w.push(Bodies.rectangle(16 * S - 15, lwSplit + lwBotH / 2, 30, lwBotH, o));
+    // Top wall (bottom edge aligned with visual at 16*S) — frictionless for smooth arc-to-play transition
+    w.push(Bodies.rectangle(170 * S, 16 * S - 15, 320 * S, 30, { ...o, friction: 0.0 }));
+    // Left wall — single section from top wall junction downward
+    const lwTop = 16 * S + 5;  // start just below top wall, no gap
+    const lwH = TH - lwTop;
+    w.push(Bodies.rectangle(16 * S - 15, lwTop + lwH / 2, 30, lwH, o));
     // Right wall (starts where the arc curve ends)
     const rwTop = 78 * S;
     const rwH = TH - rwTop;
@@ -604,14 +602,15 @@ export class PinballGame {
           this.sound.wall();
         }
         else if (other.label === 'wall') {
-          // Skip friction in the launch lane
+          // Skip friction in the launch lane and top zone (arc/top wall/upper left)
           const inLane = ball.position.x > 383 * S;
-          if (!inLane) {
+          const inTopZone = ball.position.y < 80 * S;
+          if (!inLane && !inTopZone) {
             // Friction slowdown on wall hit
             const v = ball.velocity;
             const spd = Math.sqrt(v.x * v.x + v.y * v.y);
             if (spd > 1.5) {
-              const drag = 0.96;
+              const drag = 0.985;
               Body.setVelocity(ball, { x: v.x * drag, y: v.y * drag });
               // Friction sparks
               this.wallFrictionContacts.push({
@@ -690,14 +689,15 @@ export class PinballGame {
         if (!ball) continue;
 
         if (other.label === 'wall' || other.label === 'flipper') {
-          // Skip friction in the launch lane
+          // Skip friction in the launch lane and top zone
           const inLane = ball.position.x > 383 * S;
-          if (inLane && other.label !== 'flipper') continue;
+          const inTopZone = ball.position.y < 80 * S;
+          if ((inLane || inTopZone) && other.label !== 'flipper') continue;
           const v = ball.velocity;
           const spd = Math.sqrt(v.x * v.x + v.y * v.y);
           if (spd > 1) {
             // Gentle continuous drag
-            const drag = other.label === 'flipper' ? 0.97 : 0.993;
+            const drag = other.label === 'flipper' ? 0.97 : 0.997;
             Body.setVelocity(ball, { x: v.x * drag, y: v.y * drag });
             // Emit small sparks periodically
             const now = Date.now();
@@ -1217,19 +1217,11 @@ export class PinballGame {
         this.launchPower = 0;
       }
 
-      // Anti-stuck: nudge ball if it's nearly stationary in the playing field
-      if (this.ballLaunched && bx < 383 * S && spd < 0.5) {
-        if (!this._stuckTimer) this._stuckTimer = Date.now();
-        if (Date.now() - this._stuckTimer > 800) {
-          // Give a random nudge to dislodge
-          Body.setVelocity(this.ball, {
-            x: (Math.random() - 0.5) * 5,
-            y: -2 - Math.random() * 3
-          });
-          this._stuckTimer = 0;
-        }
-      } else {
-        this._stuckTimer = 0;
+      // Anti-stuck: apply gradual force when ball is slow (no sudden jumps)
+      if (this.ballLaunched && bx < 383 * S && spd < 1.5) {
+        // Gentle continuous push: away from nearest wall + downward
+        const forceX = bx < TW / 2 ? 0.0015 : -0.0015;
+        Body.applyForce(this.ball, this.ball.position, { x: forceX, y: 0.001 });
       }
     }
   }
@@ -1326,13 +1318,12 @@ export class PinballGame {
       }
     }
 
-    // Arc curve guide — physical arc bodies handle ball redirection now,
-    // only apply a gentle nudge at the very top to prevent the ball stalling
-    if (this.ball && this.ball.position.y < 40 * S) {
+    // Arc curve guide — nudge ball leftward when it stalls near the top
+    if (this.ball && this.ball.position.y < 60 * S) {
       const v = this.ball.velocity;
       const spd = Math.sqrt(v.x * v.x + v.y * v.y);
-      if (spd < 2 && this.ball.position.x > 200 * S) {
-        Body.applyForce(this.ball, this.ball.position, { x: -0.0005, y: 0.0003 });
+      if (spd < 4 && this.ball.position.x > 100 * S) {
+        Body.applyForce(this.ball, this.ball.position, { x: -0.004, y: 0.002 });
       }
     }
 
