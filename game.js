@@ -1298,9 +1298,10 @@ export class PinballGame {
     }
 
     // Ball going up: gentle drag to simulate tilted table incline
+    // Apply to both components so the ball doesn't slide sideways at the apex
     if (this.ball && this.ball.velocity.y < -1 && this.ball.position.x < 383 * S) {
       const v = this.ball.velocity;
-      Body.setVelocity(this.ball, { x: v.x, y: v.y * 0.999 });
+      Body.setVelocity(this.ball, { x: v.x * 0.999, y: v.y * 0.999 });
     }
 
     // Gentle push out of wall-slope corner junctions to prevent getting stuck
@@ -1318,12 +1319,12 @@ export class PinballGame {
       }
     }
 
-    // Arc curve guide — nudge ball leftward when it stalls near the top
+    // Arc curve guide — nudge ball leftward only when truly stuck near the top
     if (this.ball && this.ball.position.y < 60 * S) {
       const v = this.ball.velocity;
       const spd = Math.sqrt(v.x * v.x + v.y * v.y);
-      if (spd < 4 && this.ball.position.x > 100 * S) {
-        Body.applyForce(this.ball, this.ball.position, { x: -0.004, y: 0.002 });
+      if (spd < 1.5 && this.ball.position.x > 100 * S) {
+        Body.applyForce(this.ball, this.ball.position, { x: -0.003, y: 0.002 });
       }
     }
 
