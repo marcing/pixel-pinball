@@ -1217,8 +1217,10 @@ export class PinballGame {
         this.launchPower = 0;
       }
 
-      // Anti-stuck: apply gradual force when ball is slow (no sudden jumps)
-      if (this.ballLaunched && bx < 383 * S && spd < 1.5) {
+      // Anti-stuck: apply gradual force when ball is slow (no sudden jumps).
+      // Only in the lower half — near the apex the ball is naturally slow and
+      // gravity will bring it back down without artificial sideways nudges.
+      if (this.ballLaunched && bx < 383 * S && by > TH * 0.45 && spd < 1.5) {
         // Gentle continuous push: away from nearest wall + downward
         const forceX = bx < TW / 2 ? 0.0015 : -0.0015;
         Body.applyForce(this.ball, this.ball.position, { x: forceX, y: 0.001 });
@@ -1297,11 +1299,11 @@ export class PinballGame {
       Engine.update(this.engine, fixedDt);
     }
 
-    // Ball going up: gentle drag to simulate tilted table incline
-    // Apply to both components so the ball doesn't slide sideways at the apex
-    if (this.ball && this.ball.velocity.y < -1 && this.ball.position.x < 383 * S) {
+    // Tilted-table drag — ball going uphill loses a little energy each frame.
+    // Only horizontal drag; vertical deceleration is handled by gravity alone.
+    if (this.ball && this.ballLaunched && this.ball.position.x < 383 * S && this.ball.velocity.y < 0) {
       const v = this.ball.velocity;
-      Body.setVelocity(this.ball, { x: v.x * 0.999, y: v.y * 0.999 });
+      Body.setVelocity(this.ball, { x: v.x * 0.999, y: v.y });
     }
 
     // Gentle push out of wall-slope corner junctions to prevent getting stuck
